@@ -5,6 +5,8 @@ body {
 
 h1 {
     text-align: center;
+    text-shadow: #04AA6D 0px 0px 20px;
+    font-size: 50px;
     color: rgb(255, 255, 255);
     margin-left: 20px;
 }
@@ -16,12 +18,12 @@ h2 {
 }
 
 sep {
-    height: 200px;
+    height: 50px;
     display: block;
 }
 
 .gameLink {
-    width: 90%;
+    width: 50%;
     border: 1px solid #04AA6D;
     transform: scale(1);
     transition: all 0.1s ease-in-out;
@@ -31,4 +33,11 @@ sep {
     border: 3px solid #04AA6D;
     transform: scale(1.02);
     transition: all 0.1s ease-in-out;
+}
+
+.container {
+    background-color: rgb(0, 0, 0);
+    text-align: center;
+    margin: 10px;
+    padding: 50px;
 }
