@@ -24,11 +24,11 @@ sep {
     width: 90%;
     border: 1px solid #04AA6D;
     transform: scale(1);
-    transition: all 0.3s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
 .gameLink:hover {
     border: 3px solid #04AA6D;
-    transform: scale(1.05);
-    transition: all 0.3s ease-in-out;
+    transform: scale(1.02);
+    transition: all 0.1s ease-in-out;
 }
