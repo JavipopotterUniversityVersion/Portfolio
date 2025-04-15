@@ -20,15 +20,15 @@ sep {
     display: block;
 }
 
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+.gameLink {
+    width: 90%;
+    border: 1px solid #04AA6D;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
 }
 
-container:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
+.gameLink:hover {
+    border: 3px solid #04AA6D;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
 }
