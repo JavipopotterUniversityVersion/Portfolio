@@ -51,13 +51,7 @@
 		}
 
 	// Footer.
-		breakpoints.on('<=medium', function() {
-			$footer.insertAfter($main);
-		});
-
-		breakpoints.on('>medium', function() {
-			$footer.appendTo($header);
-		});
+		$footer.insertAfter($main);
 
 	// Header.
 
@@ -148,6 +142,108 @@
 
 			updateButtonLabel();
 			syncIframeAudioState();
+		}());
+
+	// Puppet follower.
+		(function () {
+			var layer = document.getElementById('puppet-layer');
+			var leftPuppet = document.getElementById('left-puppet');
+			var rightPuppet = document.getElementById('right-puppet');
+
+			if (!layer || !leftPuppet || !rightPuppet || browser.mobile) {
+				return;
+			}
+
+			var targetX = window.innerWidth * 0.5;
+			var leftX = window.innerWidth * 0.28;
+			var rightX = window.innerWidth * 0.72;
+			var leftVx = 0;
+			var rightVx = 0;
+			var stopThreshold = 36;
+			var puppetGap = 130;
+
+			function clamp(value, min, max) {
+				return Math.min(max, Math.max(min, value));
+			}
+
+			function updateTopAnchor() {
+				var header = document.getElementById('header');
+				if (!header) {
+					return;
+				}
+				var headerRect = header.getBoundingClientRect();
+				var top = clamp(headerRect.bottom - 105, 36, window.innerHeight - 120);
+				leftPuppet.style.top = top + 'px';
+				rightPuppet.style.top = top + 'px';
+			}
+
+			function updatePuppet(puppet, currentX, currentVx, targetPosition, accel, maxSpeed) {
+				var width = puppet.offsetWidth || 72;
+				var minX = 8;
+				var maxX = window.innerWidth - width - 8;
+				var dx = targetPosition - currentX;
+				var moving = Math.abs(dx) > stopThreshold;
+				var desiredSpeed = clamp(dx * 0.06, -maxSpeed, maxSpeed);
+				var facingRight = currentX < targetX;
+
+				if (moving) {
+					if (currentVx < desiredSpeed) {
+						currentVx = Math.min(desiredSpeed, currentVx + accel);
+					} else if (currentVx > desiredSpeed) {
+						currentVx = Math.max(desiredSpeed, currentVx - accel);
+					}
+
+					currentVx = clamp(currentVx, -maxSpeed, maxSpeed);
+					currentX += currentVx;
+					puppet.classList.add('is-moving');
+				} else {
+					currentVx = 0;
+					puppet.classList.remove('is-moving');
+				}
+
+				currentX = clamp(currentX, minX, maxX);
+				puppet.style.transform = 'translate3d(' + currentX + 'px, 0, 0) scaleX(' + (facingRight ? -1 : 1) + ')';
+
+				return {
+					x: currentX,
+					vx: currentVx
+				};
+			}
+
+			function animate() {
+				var leftWidth = leftPuppet.offsetWidth || 72;
+				var rightWidth = rightPuppet.offsetWidth || 72;
+				var minLeft = 8;
+				var maxLeft = window.innerWidth - leftWidth - rightWidth - puppetGap - 8;
+				var minRight = leftWidth + puppetGap + 8;
+				var maxRight = window.innerWidth - rightWidth - 8;
+
+				var leftTarget = clamp(targetX - puppetGap - leftWidth, minLeft, Math.max(minLeft, maxLeft));
+				var rightTarget = clamp(targetX + puppetGap, Math.max(minRight, minLeft), maxRight);
+
+				var leftState = updatePuppet(leftPuppet, leftX, leftVx, leftTarget, 0.08, 4.7);
+				leftX = leftState.x;
+				leftVx = leftState.vx;
+
+				var rightState = updatePuppet(rightPuppet, rightX, rightVx, rightTarget, 0.14, 3.8);
+				rightX = rightState.x;
+				rightVx = rightState.vx;
+				requestAnimationFrame(animate);
+			}
+
+			window.addEventListener('mousemove', function (event) {
+				targetX = event.clientX;
+			});
+
+			window.addEventListener('resize', function () {
+				targetX = clamp(targetX, 0, window.innerWidth);
+				updateTopAnchor();
+			});
+
+			window.addEventListener('scroll', updateTopAnchor, { passive: true });
+
+			updateTopAnchor();
+			animate();
 		}());
 
 })(jQuery);
