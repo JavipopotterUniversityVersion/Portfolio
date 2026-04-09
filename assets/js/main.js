@@ -114,4 +114,40 @@
 
 			});
 
+	// One More Step audio toggle.
+		(function () {
+			var toggleButton = document.getElementById('one-more-step-audio-toggle');
+			var gameFrame = document.getElementById('one-more-step-iframe');
+			var muted = true;
+
+			if (!toggleButton || !gameFrame) {
+				return;
+			}
+
+			function syncIframeAudioState() {
+				if (!gameFrame.contentWindow) {
+					return;
+				}
+				gameFrame.contentWindow.postMessage({ type: 'oms:set-muted', muted: muted }, '*');
+			}
+
+			function updateButtonLabel() {
+				toggleButton.textContent = muted ? 'Activar sonido' : 'Silenciar';
+				toggleButton.setAttribute('aria-pressed', String(muted));
+			}
+
+			toggleButton.addEventListener('click', function () {
+				muted = !muted;
+				updateButtonLabel();
+				syncIframeAudioState();
+			});
+
+			gameFrame.addEventListener('load', function () {
+				syncIframeAudioState();
+			});
+
+			updateButtonLabel();
+			syncIframeAudioState();
+		}());
+
 })(jQuery);
