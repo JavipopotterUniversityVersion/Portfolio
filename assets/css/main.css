@@ -165,9 +165,17 @@ blockquote, q {
 	}
 
 	@media screen and (max-width: 980px) {
-		#puppet-layer,
-		.puppet {
+		#header::before,
+		#header::after {
 			display: none;
+		}
+
+		.puppet {
+			width: clamp(46px, 11vw, 68px);
+		}
+
+		.puppet.is-moving img {
+			animation-duration: 0.4s;
 		}
 	}
 

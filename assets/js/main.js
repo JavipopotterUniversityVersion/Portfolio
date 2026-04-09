@@ -150,7 +150,7 @@
 			var leftPuppet = document.getElementById('left-puppet');
 			var rightPuppet = document.getElementById('right-puppet');
 
-			if (!layer || !leftPuppet || !rightPuppet || browser.mobile) {
+			if (!layer || !leftPuppet || !rightPuppet) {
 				return;
 			}
 
@@ -231,9 +231,35 @@
 				requestAnimationFrame(animate);
 			}
 
+			function setTargetFromClientX(clientX) {
+				targetX = clamp(clientX, 0, window.innerWidth);
+			}
+
 			window.addEventListener('mousemove', function (event) {
-				targetX = event.clientX;
+				setTargetFromClientX(event.clientX);
 			});
+
+			window.addEventListener('pointerdown', function (event) {
+				setTargetFromClientX(event.clientX);
+			}, { passive: true });
+
+			window.addEventListener('pointermove', function (event) {
+				setTargetFromClientX(event.clientX);
+			}, { passive: true });
+
+			window.addEventListener('touchstart', function (event) {
+				if (!event.touches || !event.touches.length) {
+					return;
+				}
+				setTargetFromClientX(event.touches[0].clientX);
+			}, { passive: true });
+
+			window.addEventListener('touchmove', function (event) {
+				if (!event.touches || !event.touches.length) {
+					return;
+				}
+				setTargetFromClientX(event.touches[0].clientX);
+			}, { passive: true });
 
 			window.addEventListener('resize', function () {
 				targetX = clamp(targetX, 0, window.innerWidth);
