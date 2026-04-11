@@ -110,16 +110,25 @@
 
 	// One More Step audio toggle.
 		(function () {
+			var loadButton = document.getElementById('one-more-step-load');
 			var toggleButton = document.getElementById('one-more-step-audio-toggle');
 			var gameFrame = document.getElementById('one-more-step-iframe');
+			var gameEmbed = document.querySelector('#one-more-step .game-embed');
 			var muted = true;
+			var isLoaded = false;
 
-			if (!toggleButton || !gameFrame) {
+			if (!loadButton || !toggleButton || !gameFrame || !gameEmbed) {
 				return;
 			}
 
+			function syncIframeAudioStateReliable() {
+				syncIframeAudioState();
+				window.setTimeout(syncIframeAudioState, 120);
+				window.setTimeout(syncIframeAudioState, 480);
+			}
+
 			function syncIframeAudioState() {
-				if (!gameFrame.contentWindow) {
+				if (!isLoaded || !gameFrame.contentWindow) {
 					return;
 				}
 				gameFrame.contentWindow.postMessage({ type: 'oms:set-muted', muted: muted }, '*');
@@ -130,18 +139,38 @@
 				toggleButton.setAttribute('aria-pressed', String(muted));
 			}
 
+			function loadGame() {
+				if (isLoaded) {
+					return;
+				}
+
+				var gameSrc = gameFrame.getAttribute('data-src');
+				if (!gameSrc) {
+					return;
+				}
+
+				isLoaded = true;
+				gameFrame.setAttribute('src', gameSrc);
+				gameEmbed.classList.add('is-loaded');
+				loadButton.textContent = 'Juego cargando...';
+				loadButton.disabled = true;
+			}
+
+			loadButton.addEventListener('click', loadGame);
+
 			toggleButton.addEventListener('click', function () {
 				muted = !muted;
 				updateButtonLabel();
-				syncIframeAudioState();
+				syncIframeAudioStateReliable();
 			});
 
 			gameFrame.addEventListener('load', function () {
-				syncIframeAudioState();
+				loadButton.textContent = 'Juego cargado';
+				syncIframeAudioStateReliable();
 			});
 
 			updateButtonLabel();
-			syncIframeAudioState();
+			syncIframeAudioStateReliable();
 		}());
 
 	// Puppet follower.
@@ -155,12 +184,52 @@
 			}
 
 			var targetX = window.innerWidth * 0.5;
-			var leftX = window.innerWidth * 0.28;
-			var rightX = window.innerWidth * 0.72;
-			var leftVx = 0;
-			var rightVx = 0;
+			var baseTop = 0;
 			var stopThreshold = 36;
 			var puppetGap = 130;
+			var gravity = 0.72;
+			var maxFallSpeed = 18;
+			var bounceDamping = 0.52;
+
+			var leftState = {
+				el: leftPuppet,
+				x: window.innerWidth * 0.28,
+				y: 0,
+				vx: 0,
+				vy: 0,
+				isDragging: false,
+				isFalling: false,
+				dragTilt: 0,
+				dragPointerId: null,
+				lastPointerX: 0,
+				lastPointerY: 0,
+				lastPointerTs: 0,
+				dragOffsetX: 0,
+				dragOffsetY: 0,
+				accel: 0.08,
+				maxSpeed: 4.7
+			};
+
+			var rightState = {
+				el: rightPuppet,
+				x: window.innerWidth * 0.72,
+				y: 0,
+				vx: 0,
+				vy: 0,
+				isDragging: false,
+				isFalling: false,
+				dragTilt: 0,
+				dragPointerId: null,
+				lastPointerX: 0,
+				lastPointerY: 0,
+				lastPointerTs: 0,
+				dragOffsetX: 0,
+				dragOffsetY: 0,
+				accel: 0.14,
+				maxSpeed: 3.8
+			};
+
+			var puppets = [leftState, rightState];
 
 			function clamp(value, min, max) {
 				return Math.min(max, Math.max(min, value));
@@ -172,47 +241,177 @@
 					return;
 				}
 				var headerRect = header.getBoundingClientRect();
-				var top = clamp(headerRect.bottom - 105, 36, window.innerHeight - 120);
-				leftPuppet.style.top = top + 'px';
-				rightPuppet.style.top = top + 'px';
+				baseTop = clamp(headerRect.bottom - 105, 36, window.innerHeight - 120);
+
+				puppets.forEach(function (puppet) {
+					if (!puppet.isDragging && !puppet.isFalling) {
+						puppet.y = baseTop;
+					}
+				});
 			}
 
-			function updatePuppet(puppet, currentX, currentVx, targetPosition, accel, maxSpeed) {
-				var width = puppet.offsetWidth || 72;
+			function updatePuppet(puppet, targetPosition) {
+				var width = puppet.el.offsetWidth || 72;
 				var minX = 8;
 				var maxX = window.innerWidth - width - 8;
-				var dx = targetPosition - currentX;
+				var dx = targetPosition - puppet.x;
 				var moving = Math.abs(dx) > stopThreshold;
-				var desiredSpeed = clamp(dx * 0.06, -maxSpeed, maxSpeed);
-				var facingRight = currentX < targetX;
+				var desiredSpeed = clamp(dx * 0.06, -puppet.maxSpeed, puppet.maxSpeed);
+				var facingRight = puppet.x < targetX;
+				var topLimit = baseTop + 24;
 
-				if (moving) {
-					if (currentVx < desiredSpeed) {
-						currentVx = Math.min(desiredSpeed, currentVx + accel);
-					} else if (currentVx > desiredSpeed) {
-						currentVx = Math.max(desiredSpeed, currentVx - accel);
+				if (puppet.isDragging) {
+					puppet.isFalling = false;
+					puppet.el.classList.remove('is-moving');
+					puppet.y = Math.min(puppet.y, topLimit);
+				} else {
+					if (moving) {
+						if (puppet.vx < desiredSpeed) {
+							puppet.vx = Math.min(desiredSpeed, puppet.vx + puppet.accel);
+						} else if (puppet.vx > desiredSpeed) {
+							puppet.vx = Math.max(desiredSpeed, puppet.vx - puppet.accel);
+						}
+
+						puppet.vx = clamp(puppet.vx, -puppet.maxSpeed, puppet.maxSpeed);
+					} else {
+						puppet.vx *= 0.9;
+						if (Math.abs(puppet.vx) < 0.04) {
+							puppet.vx = 0;
+						}
 					}
 
-					currentVx = clamp(currentVx, -maxSpeed, maxSpeed);
-					currentX += currentVx;
-					puppet.classList.add('is-moving');
-				} else {
-					currentVx = 0;
-					puppet.classList.remove('is-moving');
+					puppet.x += puppet.vx;
+					if (moving || Math.abs(puppet.vx) > 0.08) {
+						puppet.el.classList.add('is-moving');
+					} else {
+						puppet.el.classList.remove('is-moving');
+					}
+
+					if (puppet.isFalling) {
+						puppet.vy = clamp(puppet.vy + gravity, -maxFallSpeed, maxFallSpeed);
+						puppet.y += puppet.vy;
+						if (puppet.y >= baseTop) {
+							var impactSpeed = Math.abs(puppet.vy);
+							puppet.y = baseTop;
+							if (impactSpeed > 2.2) {
+								puppet.vy = -(impactSpeed * bounceDamping);
+								puppet.y += puppet.vy;
+							} else {
+								puppet.vy = 0;
+								puppet.isFalling = false;
+							}
+						}
+					} else {
+						puppet.y = baseTop;
+					}
+
+					puppet.dragTilt *= 0.84;
+					if (Math.abs(puppet.dragTilt) < 0.2) {
+						puppet.dragTilt = 0;
+					}
 				}
 
-				currentX = clamp(currentX, minX, maxX);
-				puppet.style.transform = 'translate3d(' + currentX + 'px, 0, 0) scaleX(' + (facingRight ? -1 : 1) + ')';
+				puppet.x = clamp(puppet.x, minX, maxX);
+				puppet.y = clamp(puppet.y, 0, window.innerHeight - 36);
+				puppet.el.style.top = puppet.y + 'px';
+				puppet.el.style.transform = 'translate3d(' + puppet.x + 'px, 0, 0) scaleX(' + (facingRight ? -1 : 1) + ') rotate(' + puppet.dragTilt + 'deg)';
+			}
 
-				return {
-					x: currentX,
-					vx: currentVx
-				};
+			function startDrag(puppet, event) {
+				event.preventDefault();
+				var rect = puppet.el.getBoundingClientRect();
+				puppet.isDragging = true;
+				puppet.dragPointerId = event.pointerId;
+				puppet.lastPointerX = event.clientX;
+				puppet.lastPointerY = event.clientY;
+				puppet.lastPointerTs = performance.now();
+				puppet.dragOffsetX = event.clientX - rect.left;
+				puppet.dragOffsetY = event.clientY - rect.top;
+				puppet.vx = 0;
+				puppet.vy = 0;
+				puppet.isFalling = false;
+				puppet.el.classList.add('is-dragging');
+				targetX = event.clientX;
+				if (puppet.el.setPointerCapture) {
+					puppet.el.setPointerCapture(event.pointerId);
+				}
+				window.getSelection().removeAllRanges();
+			}
+
+			function dragMove(puppet, event) {
+				if (!puppet.isDragging || puppet.dragPointerId !== event.pointerId) {
+					return;
+				}
+
+				var width = puppet.el.offsetWidth || 72;
+				var minX = 8;
+				var maxX = window.innerWidth - width - 8;
+				var maxY = window.innerHeight - 36;
+				var now = performance.now();
+				var dt = Math.max(1, now - puppet.lastPointerTs);
+				var pointerDx = event.clientX - puppet.lastPointerX;
+				var pointerDy = event.clientY - puppet.lastPointerY;
+
+				puppet.x = clamp(event.clientX - puppet.dragOffsetX, minX, maxX);
+				puppet.y = clamp(event.clientY - puppet.dragOffsetY, 0, maxY);
+				puppet.dragTilt = clamp((event.clientX - puppet.lastPointerX) * 1.55, -34, 34);
+				puppet.vx = clamp((pointerDx / dt) * 16.67, -8, 8);
+				puppet.vy = clamp((pointerDy / dt) * 16.67, -maxFallSpeed, maxFallSpeed);
+				puppet.lastPointerX = event.clientX;
+				puppet.lastPointerY = event.clientY;
+				puppet.lastPointerTs = now;
+				targetX = event.clientX;
+			}
+
+			function endDrag(puppet, event) {
+				if (!puppet.isDragging || puppet.dragPointerId !== event.pointerId) {
+					return;
+				}
+
+				puppet.isDragging = false;
+				puppet.dragPointerId = null;
+				puppet.el.classList.remove('is-dragging');
+
+				if (puppet.y < baseTop) {
+					puppet.isFalling = true;
+				} else {
+					puppet.y = baseTop;
+					puppet.vy = 0;
+					puppet.isFalling = false;
+				}
+
+				if (puppet.el.releasePointerCapture) {
+					try {
+						puppet.el.releasePointerCapture(event.pointerId);
+					} catch (e) {
+					}
+				}
+			}
+
+			function bindDrag(puppet) {
+				puppet.el.addEventListener('pointerdown', function (event) {
+					if (event.button !== undefined && event.button !== 0) {
+						return;
+					}
+					startDrag(puppet, event);
+				});
+
+				puppet.el.addEventListener('pointermove', function (event) {
+					dragMove(puppet, event);
+				});
+
+				puppet.el.addEventListener('pointerup', function (event) {
+					endDrag(puppet, event);
+				});
+
+				puppet.el.addEventListener('pointercancel', function (event) {
+					endDrag(puppet, event);
+				});
 			}
 
 			function animate() {
-				var leftWidth = leftPuppet.offsetWidth || 72;
-				var rightWidth = rightPuppet.offsetWidth || 72;
+				var leftWidth = leftState.el.offsetWidth || 72;
+				var rightWidth = rightState.el.offsetWidth || 72;
 				var minLeft = 8;
 				var maxLeft = window.innerWidth - leftWidth - rightWidth - puppetGap - 8;
 				var minRight = leftWidth + puppetGap + 8;
@@ -221,13 +420,8 @@
 				var leftTarget = clamp(targetX - puppetGap - leftWidth, minLeft, Math.max(minLeft, maxLeft));
 				var rightTarget = clamp(targetX + puppetGap, Math.max(minRight, minLeft), maxRight);
 
-				var leftState = updatePuppet(leftPuppet, leftX, leftVx, leftTarget, 0.08, 4.7);
-				leftX = leftState.x;
-				leftVx = leftState.vx;
-
-				var rightState = updatePuppet(rightPuppet, rightX, rightVx, rightTarget, 0.14, 3.8);
-				rightX = rightState.x;
-				rightVx = rightState.vx;
+				updatePuppet(leftState, leftTarget);
+				updatePuppet(rightState, rightTarget);
 				requestAnimationFrame(animate);
 			}
 
@@ -268,6 +462,8 @@
 
 			window.addEventListener('scroll', updateTopAnchor, { passive: true });
 
+			bindDrag(leftState);
+			bindDrag(rightState);
 			updateTopAnchor();
 			animate();
 		}());

@@ -116,14 +116,56 @@ const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
 window.__omsMuted = true;
+window.__omsAudioContexts = [];
+
+function wrapAudioContextConstructor(name) {
+	const OriginalCtor = window[name];
+	if (typeof OriginalCtor !== 'function') {
+		return;
+	}
+
+	function WrappedAudioContext() {
+		const ctx = new OriginalCtor(...arguments);
+		window.__omsAudioContexts.push(ctx);
+		if (window.__omsMuted && typeof ctx.suspend === 'function') {
+			ctx.suspend().catch(() => {});
+		}
+		return ctx;
+	}
+
+	WrappedAudioContext.prototype = OriginalCtor.prototype;
+	Object.setPrototypeOf(WrappedAudioContext, OriginalCtor);
+	window[name] = WrappedAudioContext;
+}
+
+wrapAudioContextConstructor('AudioContext');
+wrapAudioContextConstructor('webkitAudioContext');
+
+function applyMuteState() {
+	if (typeof engine.setAudioMuted === 'function') {
+		engine.setAudioMuted(window.__omsMuted);
+	}
+
+	window.__omsAudioContexts.forEach((ctx) => {
+		if (!ctx) {
+			return;
+		}
+		if (window.__omsMuted) {
+			if (typeof ctx.suspend === 'function') {
+				ctx.suspend().catch(() => {});
+			}
+		} else if (typeof ctx.resume === 'function') {
+			ctx.resume().catch(() => {});
+		}
+	});
+}
+
 window.addEventListener('message', function (event) {
 	if (!event || !event.data || event.data.type !== 'oms:set-muted') {
 		return;
 	}
 	window.__omsMuted = !!event.data.muted;
-	if (typeof engine.setAudioMuted === 'function') {
-		engine.setAudioMuted(window.__omsMuted);
-	}
+	applyMuteState();
 });
 
 (function () {
@@ -221,9 +263,7 @@ window.addEventListener('message', function (event) {
 				}
 			},
 		}).then(() => {
-			if (window.__omsMuted && typeof engine.setAudioMuted === 'function') {
-				engine.setAudioMuted(true);
-			}
+			applyMuteState();
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}

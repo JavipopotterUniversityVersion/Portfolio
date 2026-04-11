@@ -76,10 +76,21 @@ blockquote, q {
 
 	.puppet {
 		left: 0;
+		cursor: grab;
+		pointer-events: auto;
 		position: fixed;
 		top: var(--puppet-top, 18rem);
+		touch-action: none;
+		transform-origin: 50% 100%;
+		user-select: none;
 		width: clamp(58px, 6vw, 92px);
 		will-change: transform;
+		z-index: 1;
+	}
+
+	.puppet.is-dragging {
+		cursor: grabbing;
+		z-index: 50;
 	}
 
 	.puppet img {
@@ -160,8 +171,28 @@ blockquote, q {
 
 	#one-more-step .game-controls {
 		display: flex;
+		gap: 0.75em;
 		justify-content: flex-end;
 		margin-top: 1em;
+		flex-wrap: wrap;
+	}
+
+	#one-more-step .game-embed:not(.is-loaded) {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		min-height: 220px;
+	}
+
+	#one-more-step .game-embed:not(.is-loaded)::before {
+		color: rgba(255, 255, 255, 0.75);
+		content: 'Pulsa "Cargar juego" para iniciarlo';
+		font-size: 0.9em;
+		letter-spacing: 0.02em;
+	}
+
+	#one-more-step .game-embed:not(.is-loaded) iframe {
+		display: none;
 	}
 
 	@media screen and (max-width: 980px) {

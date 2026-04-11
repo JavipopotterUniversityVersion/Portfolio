@@ -87,12 +87,13 @@
 				<h2>One More Step <img class="inline-tech-icon" src="images/icons/godot_icon.png" alt="Godot" /></h2>
 				<p>Versión web embebida del proyecto <strong>One More Step</strong>.</p>
 				<div class="game-controls">
+					<button id="one-more-step-load" class="button small primary" type="button">Cargar juego</button>
 					<button id="one-more-step-audio-toggle" class="button small" type="button" aria-pressed="false">Silenciar</button>
 				</div>
 				<div class="game-embed">
 					<iframe
 						id="one-more-step-iframe"
-						src="OneMoreStep/One_More_Step.html"
+						data-src="OneMoreStep/One_More_Step.html"
 						title="One More Step - juego web"
 						loading="lazy"
 						allowfullscreen>
