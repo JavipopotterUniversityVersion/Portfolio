@@ -3432,3 +3432,316 @@ input, select, textarea {
 
 
 	}
+
+/* Neobrutalist portfolio skin - final cascade layer */
+
+	:root {
+		--nb-ink: #111111;
+		--nb-paper: #fff3cf;
+		--nb-panel: #ffffff;
+		--nb-mint: #56f2c4;
+		--nb-pink: #ff5aa5;
+		--nb-yellow: #ffe14d;
+		--nb-blue: #6ed3ff;
+		--nb-border: 4px solid var(--nb-ink);
+		--nb-shadow: 8px 8px 0 var(--nb-ink);
+	}
+
+	body, input, select, textarea {
+		background: var(--nb-paper);
+		color: var(--nb-ink);
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
+	body {
+		background-color: var(--nb-paper);
+		background-image: linear-gradient(var(--nb-ink) 1px, transparent 1px), linear-gradient(90deg, var(--nb-ink) 1px, transparent 1px);
+		background-size: 42px 42px;
+	}
+
+	a {
+		border-bottom: 3px solid var(--nb-ink);
+		color: var(--nb-ink);
+		font-weight: 700;
+	}
+
+	a:hover {
+		background: var(--nb-yellow);
+		color: var(--nb-ink) !important;
+	}
+
+	strong, b,
+	h1, h2, h3, h4, h5, h6 {
+		color: var(--nb-ink);
+		font-weight: 900;
+	}
+
+	h1, h2, h3 {
+		letter-spacing: -0.04em;
+		text-transform: uppercase;
+	}
+
+	p {
+		color: var(--nb-ink);
+	}
+
+	#header {
+		background: var(--nb-pink);
+		border-bottom: var(--nb-border);
+		box-shadow: 0 10px 0 var(--nb-ink);
+		color: var(--nb-ink);
+		overflow: visible;
+	}
+
+	#header::before,
+	#header::after {
+		display: none;
+	}
+
+	#header > .inner {
+		background: var(--nb-panel);
+		border: var(--nb-border);
+		box-shadow: var(--nb-shadow);
+		margin: 0 auto;
+		max-width: 42rem;
+		padding: 2rem;
+		transform: rotate(-1deg);
+	}
+
+	#header h1,
+	#header strong,
+	#header b,
+	#header .subnote {
+		color: var(--nb-ink);
+	}
+
+	#header h1 {
+		font-size: clamp(2.25rem, 7vw, 5rem);
+		line-height: 0.95;
+		text-transform: uppercase;
+	}
+
+	#header .subnote {
+		background: var(--nb-yellow);
+		border: 3px solid var(--nb-ink);
+		display: inline-block;
+		font-size: 0.35em;
+		letter-spacing: 0.03em;
+		line-height: 1.2;
+		margin-top: 0.7rem;
+		padding: 0.35rem 0.55rem;
+	}
+
+	#header .image.avatar {
+		background: var(--nb-blue);
+		border: var(--nb-border);
+		box-shadow: 6px 6px 0 var(--nb-ink);
+		padding: 0.35rem;
+		width: 7.25em;
+	}
+
+	#header .image.avatar img,
+	.image.avatar:before {
+		border-radius: 0;
+	}
+
+	#main {
+		background: transparent;
+		max-width: 76em;
+	}
+
+	#main > section {
+		background: var(--nb-panel);
+		border: var(--nb-border);
+		box-shadow: var(--nb-shadow);
+		margin: 5em 0 0 0;
+		padding: clamp(1.5rem, 4vw, 3rem);
+	}
+
+	#main > section:first-child {
+		margin-top: 0;
+		padding-top: clamp(1.5rem, 4vw, 3rem);
+	}
+
+	#main > section:nth-child(2n) {
+		background: #d9fff2;
+	}
+
+	#main > section:nth-child(3n) {
+		background: #ffe6f1;
+	}
+
+	#main > section > h2,
+	#main > section header.major h2 {
+		background: var(--nb-yellow);
+		border: var(--nb-border);
+		box-shadow: 5px 5px 0 var(--nb-ink);
+		display: inline-block;
+		font-size: clamp(2rem, 5vw, 3.5rem);
+		line-height: 1;
+		margin-bottom: 1.25rem;
+		padding: 0.25rem 0.6rem;
+		transform: rotate(-1deg);
+	}
+
+	.work-item {
+		background: var(--nb-panel);
+		border: var(--nb-border);
+		box-shadow: 6px 6px 0 var(--nb-ink);
+		padding: 1rem;
+		transition: transform 0.12s ease, box-shadow 0.12s ease;
+	}
+
+	.work-item:hover {
+		box-shadow: 3px 3px 0 var(--nb-ink);
+		transform: translate(3px, 3px) rotate(-0.5deg);
+	}
+
+	.work-item .image {
+		border-bottom: 0;
+		display: block;
+		margin-bottom: 1rem;
+	}
+
+	.work-item img {
+		border: 3px solid var(--nb-ink);
+		border-radius: 0;
+		filter: saturate(1.2) contrast(1.08);
+	}
+
+	.work-item h3 {
+		font-size: 1.2em;
+		line-height: 1.1;
+	}
+
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"],
+	.button {
+		background: var(--nb-yellow);
+		border: var(--nb-border);
+		border-radius: 0;
+		box-shadow: 5px 5px 0 var(--nb-ink);
+		color: var(--nb-ink) !important;
+		font-weight: 900;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+	}
+
+	input[type="submit"]:hover,
+	input[type="reset"]:hover,
+	input[type="button"]:hover,
+	.button:hover,
+	input[type="submit"].primary:hover,
+	input[type="reset"].primary:hover,
+	input[type="button"].primary:hover,
+	.button.primary:hover {
+		background: var(--nb-mint);
+		border-color: var(--nb-ink);
+		box-shadow: 2px 2px 0 var(--nb-ink);
+		color: var(--nb-ink) !important;
+		transform: translate(3px, 3px);
+	}
+
+	input[type="submit"].primary,
+	input[type="reset"].primary,
+	input[type="button"].primary,
+	.button.primary {
+		background: var(--nb-pink);
+		border-color: var(--nb-ink);
+		color: var(--nb-ink) !important;
+	}
+
+	#skills .skills-grid {
+		grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+	}
+
+	#skills .skill-item {
+		background: var(--nb-blue);
+		border: 3px solid var(--nb-ink);
+		border-radius: 0;
+		box-shadow: 5px 5px 0 var(--nb-ink);
+		color: var(--nb-ink);
+		font-weight: 900;
+	}
+
+	#skills .skill-item:nth-child(3n + 2) {
+		background: var(--nb-yellow);
+	}
+
+	#skills .skill-item:nth-child(3n) {
+		background: var(--nb-mint);
+	}
+
+	#skills .skill-icon {
+		filter: drop-shadow(2px 2px 0 rgba(17, 17, 17, 0.35));
+	}
+
+	#one-more-step .game-embed {
+		background: var(--nb-ink);
+		border: var(--nb-border);
+		border-radius: 0;
+		box-shadow: 6px 6px 0 var(--nb-ink);
+	}
+
+	#one-more-step .game-embed:not(.is-loaded)::before {
+		color: var(--nb-paper);
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+
+	.labeled-icons li {
+		background: var(--nb-panel);
+		border: 3px solid var(--nb-ink);
+		box-shadow: 4px 4px 0 var(--nb-ink);
+		margin-bottom: 1rem;
+		padding: 0.8rem 1rem 0.8rem 3.1rem;
+	}
+
+	ul.labeled-icons li h3 {
+		color: var(--nb-ink);
+		left: 0.9rem;
+		top: 0.75rem;
+	}
+
+	#footer {
+		background: var(--nb-ink);
+		border-top: var(--nb-border);
+		color: var(--nb-paper);
+	}
+
+	#footer .copyright,
+	#footer .copyright a {
+		color: var(--nb-paper);
+	}
+
+	.puppet img {
+		filter: drop-shadow(4px 4px 0 var(--nb-ink));
+	}
+
+	@media screen and (max-width: 736px) {
+		body {
+			background-size: 28px 28px;
+		}
+
+		#header {
+			padding: 2rem 1rem;
+		}
+
+		#header > .inner,
+		#main > section,
+		.work-item,
+		#skills .skill-item,
+		#one-more-step .game-embed {
+			box-shadow: 5px 5px 0 var(--nb-ink);
+		}
+
+		#main {
+			padding: 2rem 1rem 0.25rem 1rem;
+		}
+
+		#main > section {
+			margin-top: 2rem;
+		}
+	}
