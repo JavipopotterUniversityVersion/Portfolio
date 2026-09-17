@@ -71,7 +71,7 @@ blockquote, q {
 		position: fixed;
 		top: 0;
 		width: 100%;
-		z-index: 20;
+		z-index: 9999;
 	}
 
 	.puppet {
@@ -85,12 +85,12 @@ blockquote, q {
 		user-select: none;
 		width: clamp(58px, 6vw, 92px);
 		will-change: transform;
-		z-index: 1;
+		z-index: 10000;
 	}
 
 	.puppet.is-dragging {
 		cursor: grabbing;
-		z-index: 50;
+		z-index: 10001;
 	}
 
 	.puppet img {
@@ -3545,6 +3545,10 @@ input, select, textarea {
 		border-radius: 0;
 	}
 
+	.cv-entry-button {
+		margin-top: 1.5rem;
+	}
+
 	#main {
 		background: transparent;
 		max-width: 76em;
@@ -3705,6 +3709,10 @@ input, select, textarea {
 		top: 0.75rem;
 	}
 
+	.labeled-icons a {
+		overflow-wrap: anywhere;
+	}
+
 	#footer {
 		background: var(--nb-ink);
 		border-top: var(--nb-border);
@@ -3743,5 +3751,144 @@ input, select, textarea {
 
 		#main > section {
 			margin-top: 2rem;
+		}
+	}
+
+/* CV page */
+
+	.cv-page {
+		align-items: center;
+		display: flex;
+		min-height: 100vh;
+		padding: clamp(0.75rem, 2.5vw, 2rem);
+	}
+
+	.cv-single-panel {
+		background: var(--nb-panel);
+		border: var(--nb-border);
+		box-shadow: var(--nb-shadow);
+		display: grid;
+		gap: clamp(0.75rem, 2vw, 1.35rem);
+		margin: 0 auto;
+		max-height: calc(100vh - 2rem);
+		max-width: 1120px;
+		overflow: hidden;
+		padding: clamp(1rem, 2.6vw, 2rem);
+		width: 100%;
+	}
+
+	.cv-topline,
+	.cv-main-block,
+	.cv-grid-panel {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.cv-topline {
+		align-items: center;
+		grid-template-columns: auto 1fr;
+	}
+
+	.cv-topline p,
+	.cv-label,
+	.cv-role {
+		font-weight: 900;
+		letter-spacing: 0.04em;
+		margin: 0;
+		text-transform: uppercase;
+	}
+
+	.cv-back-link,
+	.cv-contact-box,
+	.cv-grid-panel article {
+		border: 3px solid var(--nb-ink);
+		box-shadow: 4px 4px 0 var(--nb-ink);
+	}
+
+	.cv-back-link {
+		background: var(--nb-mint);
+		display: inline-block;
+		padding: 0.3rem 0.7rem;
+		text-transform: uppercase;
+	}
+
+	.cv-main-block {
+		align-items: end;
+		grid-template-columns: 1.35fr 0.65fr;
+	}
+
+	.cv-main-block h1 {
+		font-size: clamp(3rem, 8vw, 6.5rem);
+		line-height: 0.88;
+		margin: 0.15rem 0 0.7rem;
+	}
+
+	.cv-role {
+		background: var(--nb-pink);
+		border: 3px solid var(--nb-ink);
+		display: inline-block;
+		padding: 0.3rem 0.65rem;
+	}
+
+	.cv-contact-box {
+		background: var(--nb-yellow);
+		padding: 0.8rem;
+	}
+
+	.cv-contact-box p,
+	.cv-contact-box a {
+		display: block;
+		margin: 0 0 0.35rem;
+		overflow-wrap: anywhere;
+	}
+
+	.cv-grid-panel {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.cv-grid-panel article {
+		background: #d9fff2;
+		padding: clamp(0.75rem, 1.7vw, 1.1rem);
+	}
+
+	.cv-grid-panel article:nth-child(2n) {
+		background: #ffe6f1;
+	}
+
+	.cv-grid-panel h2 {
+		font-size: clamp(1.05rem, 2vw, 1.45rem);
+		line-height: 1;
+		margin-bottom: 0.65rem;
+	}
+
+	.cv-grid-panel p,
+	.cv-grid-panel li {
+		font-size: clamp(0.82rem, 1.15vw, 0.98rem);
+		line-height: 1.35;
+	}
+
+	.cv-grid-panel p,
+	.cv-grid-panel ul {
+		margin-bottom: 0;
+	}
+
+	.cv-grid-panel ul {
+		list-style: square;
+		padding-left: 1rem;
+	}
+
+	@media screen and (max-width: 900px) {
+		.cv-page {
+			align-items: flex-start;
+		}
+
+		.cv-single-panel {
+			max-height: none;
+			overflow: visible;
+		}
+
+		.cv-main-block,
+		.cv-grid-panel {
+			grid-template-columns: 1fr;
 		}
 	}

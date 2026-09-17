@@ -236,12 +236,8 @@
 			}
 
 			function updateTopAnchor() {
-				var header = document.getElementById('header');
-				if (!header) {
-					return;
-				}
-				var headerRect = header.getBoundingClientRect();
-				baseTop = clamp(headerRect.bottom - 105, 36, window.innerHeight - 120);
+				var maxPuppetHeight = Math.max(leftPuppet.offsetHeight || 72, rightPuppet.offsetHeight || 72);
+				baseTop = Math.max(0, window.innerHeight - maxPuppetHeight);
 
 				puppets.forEach(function (puppet) {
 					if (!puppet.isDragging && !puppet.isFalling) {
@@ -252,6 +248,7 @@
 
 			function updatePuppet(puppet, targetPosition) {
 				var width = puppet.el.offsetWidth || 72;
+				var height = puppet.el.offsetHeight || 72;
 				var minX = 8;
 				var maxX = window.innerWidth - width - 8;
 				var dx = targetPosition - puppet.x;
@@ -312,7 +309,7 @@
 				}
 
 				puppet.x = clamp(puppet.x, minX, maxX);
-				puppet.y = clamp(puppet.y, 0, window.innerHeight - 36);
+				puppet.y = clamp(puppet.y, 0, window.innerHeight - height);
 				puppet.el.style.top = puppet.y + 'px';
 				puppet.el.style.transform = 'translate3d(' + puppet.x + 'px, 0, 0) scaleX(' + (facingRight ? -1 : 1) + ') rotate(' + puppet.dragTilt + 'deg)';
 			}
@@ -344,9 +341,10 @@
 				}
 
 				var width = puppet.el.offsetWidth || 72;
+				var height = puppet.el.offsetHeight || 72;
 				var minX = 8;
 				var maxX = window.innerWidth - width - 8;
-				var maxY = window.innerHeight - 36;
+				var maxY = window.innerHeight - height;
 				var now = performance.now();
 				var dt = Math.max(1, now - puppet.lastPointerTs);
 				var pointerDx = event.clientX - puppet.lastPointerX;
