@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "export:cv": "node scripts/export-cv-pdf.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
